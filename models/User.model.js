@@ -73,6 +73,7 @@ const userSchema = new mongoose.Schema(
   {
     timestamps: true,
     toJSON: {
+      virtuals: true,
       transform: (doc, ret) => {
         delete ret.__v;
         delete ret._id;
@@ -81,6 +82,34 @@ const userSchema = new mongoose.Schema(
     },
   }
 );
+
+userSchema.virtual("followers", {
+  ref: "Follow",
+  foreignField: "followed",
+  localField: "_id",
+  justOne: false,
+});
+
+userSchema.virtual("followeds", {
+  ref: "Follow",
+  foreignField: "follower",
+  localField: "_id",
+  justOne: false,
+});
+
+userSchema.virtual("notifications", {
+  ref: "Notification",
+  foreignField: "user",
+  localField: "_id",
+  justOne: false,
+});
+
+userSchema.virtual("likes", {
+  ref: "Like",
+  foreignField: "user",
+  localField: "_id",
+  justOne: false,
+});
 
 userSchema.pre("save", function (next) {
   const rawPassword = this.password;
