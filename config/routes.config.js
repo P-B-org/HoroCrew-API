@@ -9,6 +9,9 @@ const authMiddleware = require("../middlewares/auth.middleware");
 /* Auth */
 router.post("/login", authController.login);
 router.post("/signup", upload.single("image"), authController.signup);
+
+/* User */
+router.get("/users", authMiddleware.isAuthenticated, usersController.getUsers);
 router.get(
   "/users/me",
   authMiddleware.isAuthenticated,
