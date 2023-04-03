@@ -5,12 +5,12 @@ const likeSchema = new mongoose.Schema(
     user: {
       type: mongoose.Types.ObjectId,
       ref: "User",
-      required: [true, "A like must have a user"],
+      required: true,
     },
     post: {
       type: mongoose.Types.ObjectId,
       ref: "Post",
-      required: [true, "A like must have a post"],
+      required: true,
     },
   },
   {

@@ -3,6 +3,7 @@ const upload = require("../config/cloudinary.config");
 
 const authController = require("../controllers/auth.controller");
 const usersController = require("../controllers/user.controller");
+const notificationController = require("../controllers/notifications.controller");
 
 const authMiddleware = require("../middlewares/auth.middleware");
 
@@ -17,6 +18,17 @@ router.get(
   authMiddleware.isAuthenticated,
   usersController.getCurrentUser
 );
-router.get("/users/:id", usersController.getUser);
+router.get(
+  "/users/:id",
+  authMiddleware.isAuthenticated,
+  usersController.getUser
+);
+
+/* Notifications */
+router.post(
+  "/users/:id/follow",
+  authMiddleware.isAuthenticated,
+  notificationController.follow
+);
 
 module.exports = router;

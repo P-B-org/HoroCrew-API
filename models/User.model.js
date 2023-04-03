@@ -99,7 +99,14 @@ userSchema.virtual("followeds", {
 
 userSchema.virtual("notifications", {
   ref: "Notification",
-  foreignField: "user",
+  foreignField: "notificator",
+  localField: "_id",
+  justOne: false,
+});
+
+userSchema.virtual("notifications", {
+  ref: "Notification",
+  foreignField: "notificated",
   localField: "_id",
   justOne: false,
 });
