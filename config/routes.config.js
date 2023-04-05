@@ -32,6 +32,11 @@ router.post(
   authMiddleware.isAuthenticated,
   postController.deletePost
 );
+router.post(
+  "/post/:id/like",
+  authMiddleware.isAuthenticated,
+  postController.likePost
+);
 
 /* Notifications */
 router.post(

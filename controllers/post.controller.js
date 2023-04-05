@@ -1,7 +1,9 @@
 const Post = require("../models/Post.model");
 const Like = require("../models/Like.model");
+const User = require("../models/User.model");
+const Notification = require("../models/Notification.model");
 
-const { StatusCodes } = require("http-status-codes");
+const { StatusCodes, NO_CONTENT } = require("http-status-codes");
 const createError = require("http-errors");
 
 module.exports.newPost = (req, res, next) => {
@@ -42,34 +44,59 @@ module.exports.deletePost = (req, res, next) => {
     .catch(next);
 };
 
-// module.exports.like = (req, res, next) => {
-//   const user = req.user.id;
-//   const post = req.params.id;
+module.exports.likePost = (req, res, next) => {
+  const user = req.currentUserId;
+  const post = req.params.id;
 
-//   const like = {
-//     user,
-//     post,
-//   };
+  const like = {
+    user,
+    post,
+  };
 
-//   Like.findOne({ user, post })
-//     .then((dbLike) => {
-//       if (dbLike) {
-//         return Like.findByIdAndDelete(dbLike.id).then((createdLike) => {
-//           res.status(204).json({ deleted: true });
-//         });
-//       } else {
-//         return Like.create(like).then(() => {
-//           res.status(201).json({ deleted: false });
-//         });
-//       }
-//     })
-//     .catch((err) => next(err));
-// };
-
-// module.exports.doDelete = (req, res, next) => {
-//   Post.findByIdAndDelete(req.params.id)
-//     .then((post) => {
-//       res.send("Post deleted");
-//     })
-//     .catch(next);
-// };
+  Like.findOne({ $and: [{ user: user }, { post: post }] })
+    .then((dbLike) => {
+      if (dbLike) {
+        return Like.findByIdAndDelete(dbLike._id).then(() => {
+          return Post.findById(post).then((postFound) => {
+            return Notification.findOne({
+              $and: [
+                { notificator: user },
+                { notificated: postFound.user },
+                { type: "Like" },
+              ],
+            }).then((dbNotification) => {
+              if (dbNotification) {
+                Notification.findByIdAndDelete(dbNotification._id).then(
+                  (deleteNotification) => {
+                    res
+                      .status(StatusCodes.NO_CONTENT)
+                      .json(`Delete notification: ${deleteNotification}`);
+                  }
+                );
+              }
+            });
+          });
+        });
+      } else {
+        return Like.create(like).then(() => {
+          return User.findById(user).then((foundUser) => {
+            return Post.findById(post).then((postFound) => {
+              Notification.create({
+                notificator: foundUser,
+                notificated: postFound.user,
+                type: "Like",
+                message: `${foundUser.firstName} ${foundUser.lastName} liked your post`,
+                post: post,
+                read: false,
+              }).then((notification) => {
+                res
+                  .status(StatusCodes.CREATED)
+                  .json(`Created like notification: ${notification}`);
+              });
+            });
+          });
+        });
+      }
+    })
+    .catch(next);
+};

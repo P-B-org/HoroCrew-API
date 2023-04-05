@@ -37,7 +37,6 @@ module.exports.follow = (req, res, next) => {
       } else {
         return Follow.create(follow).then(() => {
           return User.findById(follower).then((user) => {
-            console.log(user);
             Notification.create({
               notificator: follower,
               notificated: followed,

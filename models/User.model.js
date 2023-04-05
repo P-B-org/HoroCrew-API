@@ -118,6 +118,13 @@ userSchema.virtual("likes", {
   justOne: false,
 });
 
+userSchema.virtual("posts", {
+  ref: "Post",
+  foreignField: "user",
+  localField: "_id",
+  justOne: false,
+});
+
 userSchema.pre("save", function (next) {
   const rawPassword = this.password;
   if (this.isModified("password")) {
