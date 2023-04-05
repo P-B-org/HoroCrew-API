@@ -1,30 +1,24 @@
 const Post = require("../models/Post.model");
 const Like = require("../models/Like.model");
 
-// module.exports.doNewPost = (req, res, next) => {
-//   const newPost = {
-//     ...req.body,
-//     user: req.user.id,
-//   };
+const { StatusCodes } = require("http-status-codes");
 
-//   if (req.file) {
-//     newPost.image = req.file.path;
-//   }
+module.exports.newPost = (req, res, next) => {
+  const newPost = {
+    ...req.body,
+    user: req.currentUserId,
+  };
 
-//   Post.create(newPost)
-//     .then((post) => {
-//       res.redirect("/timeline");
-//     })
-//     .catch((err) => {
-//       if (mongoose.Error.ValidationError) {
-//         res.render("user/new-post", {
-//           post: req.body.body,
-//           errors: err.errors,
-//         });
-//       }
-//       next(err);
-//     });
-// };
+  if (req.file) {
+    newPost.image = req.file.path;
+  }
+
+  Post.create(newPost)
+    .then((post) => {
+      res.status(StatusCodes.CREATED).json(`New post created: ${post}`);
+    })
+    .catch(next);
+};
 
 // module.exports.like = (req, res, next) => {
 //   const user = req.user.id;

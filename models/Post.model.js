@@ -5,6 +5,7 @@ const postSchema = new mongoose.Schema(
     body: {
       type: String,
       required: [true, "Your post must have some content!"],
+      max: [500, "Your post must have a maximum of 500 characters!"],
     },
     user: {
       type: mongoose.Types.ObjectId,
@@ -25,6 +26,13 @@ const postSchema = new mongoose.Schema(
 
 postSchema.virtual("likes", {
   ref: "Like",
+  foreignField: "post",
+  localField: "_id",
+  justOne: false,
+});
+
+postSchema.virtual("comments", {
+  ref: "Comment",
   foreignField: "post",
   localField: "_id",
   justOne: false,
