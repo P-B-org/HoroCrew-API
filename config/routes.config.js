@@ -26,10 +26,11 @@ router.get(
 );
 
 /* Posts */
+router.post("/post", authMiddleware.isAuthenticated, postController.newPost);
 router.post(
-  "/new-post",
+  "/post/:id/delete",
   authMiddleware.isAuthenticated,
-  postController.newPost
+  postController.deletePost
 );
 
 /* Notifications */
