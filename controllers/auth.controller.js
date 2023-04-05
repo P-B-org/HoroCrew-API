@@ -30,7 +30,7 @@ module.exports.signup = async (req, res, next) => {
     if (req.file) {
       userBody.image = req.file.path;
     } else {
-      userBody.image = `/images/signs/${signs.names.sunSign}.png`;
+      userBody.image = `/images/signs/${signs.names?.sunSign}.png`;
     }
 
     return User.create(userBody)
