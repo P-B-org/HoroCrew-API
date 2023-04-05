@@ -4,7 +4,7 @@ const upload = require("../config/cloudinary.config");
 const authController = require("../controllers/auth.controller");
 const usersController = require("../controllers/user.controller");
 const postController = require("../controllers/post.controller");
-const notificationController = require("../controllers/notifications.controller");
+const followController = require("../controllers/follow.controller");
 
 const authMiddleware = require("../middlewares/auth.middleware");
 
@@ -38,11 +38,11 @@ router.post(
   postController.likePost
 );
 
-/* Notifications */
+/* Follows */
 router.post(
   "/users/:id/follow",
   authMiddleware.isAuthenticated,
-  notificationController.follow
+  followController.follow
 );
 
 module.exports = router;
