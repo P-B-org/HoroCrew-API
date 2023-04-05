@@ -15,14 +15,8 @@ module.exports.follow = (req, res, next) => {
   Follow.findOne({ $and: [{ follower: follower }, { followed: followed }] })
     .then((dbFollow) => {
       if (dbFollow) {
-        return Follow.findByIdAndDelete(dbFollow._id).then((deletedFollow) => {
-          res
-            .status(StatusCodes.NO_CONTENT)
-            .json(`Delete follow: ${deletedFollow}`);
-        });
-      } else {
-        return Follow.create(follow).then(async () => {
-          return await Notification.findOne({
+        return Follow.findByIdAndDelete(dbFollow._id).then(() => {
+          return Notification.findOne({
             $and: [
               { notificator: follower },
               { notificated: followed },
@@ -31,27 +25,30 @@ module.exports.follow = (req, res, next) => {
           }).then((dbNotification) => {
             if (dbNotification) {
               return Notification.findByIdAndDelete(dbNotification._id).then(
-                (deletedNotification) =>
+                (deleteNotification) => {
                   res
                     .status(StatusCodes.NO_CONTENT)
-                    .json(`Delete notification: ${deletedNotification}`)
+                    .json(`Delete notification: ${deleteNotification}`);
+                }
               );
-            } else {
-              return User.findById(req.currentUserId).then((user) => {
-                console.log(user);
-                Notification.create({
-                  notificator: follower,
-                  notificated: followed,
-                  type: "Follow",
-                  message: `${req.currentUserId} followed you`,
-                  read: false,
-                }).then((notification) => {
-                  res
-                    .status(StatusCodes.NO_CONTENT)
-                    .json(`Created follow notification: ${notification}`);
-                });
-              });
             }
+          });
+        });
+      } else {
+        return Follow.create(follow).then(() => {
+          return User.findById(follower).then((user) => {
+            console.log(user);
+            Notification.create({
+              notificator: follower,
+              notificated: followed,
+              type: "Follow",
+              message: `${user.firstName} ${user.lastName} followed you`,
+              read: false,
+            }).then((notification) => {
+              res
+                .status(StatusCodes.CREATED)
+                .json(`Created follow notification: ${notification}`);
+            });
           });
         });
       }
