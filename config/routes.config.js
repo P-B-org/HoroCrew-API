@@ -26,16 +26,43 @@ router.get(
 );
 
 /* Posts */
+
+//CREATE POST
 router.post("/post", authMiddleware.isAuthenticated, postController.newPost);
+
+//GET POST WITH COMMENTS
+router.get(
+  "/post/:id",
+  authMiddleware.isAuthenticated,
+  postController.postWithComments
+);
+
+//DELETE POST
 router.post(
   "/post/:id/delete",
   authMiddleware.isAuthenticated,
   postController.deletePost
 );
+
+//LIKE POST
 router.post(
   "/post/:id/like",
   authMiddleware.isAuthenticated,
   postController.likePost
+);
+
+//COMMENT POST
+router.post(
+  "/post/:id/comment",
+  authMiddleware.isAuthenticated,
+  postController.commentPost
+);
+
+//DELETE COMMENT
+router.post(
+  "/post/comment/:id/delete",
+  authMiddleware.isAuthenticated,
+  postController.deleteComment
 );
 
 /* Follows */

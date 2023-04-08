@@ -1,7 +1,9 @@
 const Follow = require("../models/Follow.model.js");
 const Notification = require("../models/Notification.model");
 const User = require("../models/User.model");
+
 const { StatusCodes } = require("http-status-codes");
+const createError = require("http-errors");
 
 module.exports.follow = (req, res, next) => {
   const follower = req.currentUserId;
@@ -34,6 +36,10 @@ module.exports.follow = (req, res, next) => {
             }
           });
         });
+      } else if (follower === followed) {
+        next(
+          createError(StatusCodes.BAD_REQUEST, "You can't follow yourself :(")
+        );
       } else {
         return Follow.create(follow).then(() => {
           return User.findById(follower).then((user) => {
