@@ -17,9 +17,8 @@ const zodiacSigns = [
 
 //SUN SIGN CALC
 function calculateSunSign(day, month) {
-  // Define an array of zodiac sign dates
   const zodiacSignDates = [
-    { month: 12, day: 20 },
+    { month: 0, day: 20 },
     { month: 1, day: 19 },
     { month: 2, day: 20 },
     { month: 3, day: 20 },
@@ -33,15 +32,20 @@ function calculateSunSign(day, month) {
     { month: 11, day: 22 },
   ];
 
+  month = month === 12 ? 0 : month
+
   // Find the zodiac sign based on the birth date
   let sunSign = "";
   for (let i = 0; i < zodiacSignDates.length; i++) {
     const zsd = zodiacSignDates[i];
+
+    console.log('zodiacSigns[i];', zodiacSigns[i], month, day)
     if (
       (month === zsd.month && day >= zsd.day) ||
       (month === (zsd.month + 1) % 12 && day < zsd.day)
     ) {
       sunSign = zodiacSigns[i];
+
       break;
     }
   }
@@ -143,11 +147,11 @@ const astralCalc = async (
   const findSignPromises = [sunSign, moonSign, ascendantSign].map((sign) =>
     Sign.findOne({ name: sign })
   );
-  console.log(findSignPromises)
-
+  console.log('signos', sunSign, moonSign, ascendantSign)
   const result = await Promise.all(findSignPromises)
     .then((signs) => {
       const [sunSign, moonSign, ascendantSign] = signs;
+      console.log('signs', signs)
       return {
         ids: {
           sunSign: sunSign._id,
@@ -162,7 +166,7 @@ const astralCalc = async (
       };
     })
     .catch((err) => err);
-  console.log(result)
+
   return result;
 };
 
