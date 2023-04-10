@@ -143,11 +143,13 @@ module.exports.deleteComment = (req, res, next) => {
 module.exports.postWithComments = (req, res, next) => {
   Post.findById(req.params.id)
     .then((post) => {
-      if (post) {
-        res.json(post);
-      } else if (!post) {
-        next(authError);
-      }
+      return Comment.find({ post: post._id }).then((comments) => {
+        const postWithComments = {
+          post,
+          comments,
+        };
+        res.json(postWithComments);
+      });
     })
     .catch(next);
 };
