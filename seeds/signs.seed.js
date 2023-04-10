@@ -15,7 +15,7 @@ mongoose.connection.once("open", () => {
   );
 
   mongoose.connection.db
-    .dropDatabase()
+    .dropCollection('signs')
     .then(() => {
       console.info("DB has been cleared");
 
