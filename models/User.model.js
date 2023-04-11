@@ -97,6 +97,20 @@ userSchema.virtual("followeds", {
   justOne: false,
 });
 
+userSchema.virtual("messages", {
+  ref: "Message",
+  foreignField: "receiver",
+  localField: "_id",
+  justOne: false,
+});
+
+userSchema.virtual("messages", {
+  ref: "Message",
+  foreignField: "sender",
+  localField: "_id",
+  justOne: false,
+});
+
 userSchema.virtual("notifications", {
   ref: "Notification",
   foreignField: "notificator",

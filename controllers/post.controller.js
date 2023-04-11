@@ -4,7 +4,7 @@ const Like = require("../models/Like.model");
 const Comment = require("../models/Comment.model");
 const Notification = require("../models/Notification.model");
 
-const { StatusCodes, NO_CONTENT } = require("http-status-codes");
+const { StatusCodes } = require("http-status-codes");
 const createError = require("http-errors");
 
 const authError = createError(
@@ -58,47 +58,41 @@ module.exports.likePost = (req, res, next) => {
   };
 
   Like.findOne({ $and: [{ user: user }, { post: post }] })
-    .then((dbLike) => {
+    .then(async (dbLike) => {
       if (dbLike) {
-        return Like.findByIdAndDelete(dbLike._id).then(() => {
-          return Post.findById(post).then((postFound) => {
+        return Like.findByIdAndDelete(dbLike._id)
+          .populate("post")
+          .then((deleteLike) => {
             return Notification.findOne({
               $and: [
-                { notificator: user },
-                { notificated: postFound.user },
+                { notificator: deleteLike.user },
+                { notificated: deleteLike.post.user },
                 { type: "Like" },
               ],
             }).then((dbNotification) => {
-              if (dbNotification) {
-                Notification.findByIdAndDelete(dbNotification._id).then(
-                  (deleteNotification) => {
-                    res
-                      .status(StatusCodes.NO_CONTENT)
-                      .json(`Delete notification: ${deleteNotification}`);
-                  }
-                );
-              }
+              Notification.findByIdAndDelete(dbNotification).then(
+                (deleteNotification) => {
+                  res
+                    .status(StatusCodes.NO_CONTENT)
+                    .json(`Delete notification: ${deleteNotification}`);
+                }
+              );
             });
           });
-        });
       } else {
-        return Like.create(like).then(() => {
-          return User.findById(user).then((foundUser) => {
-            return Post.findById(post).then((postFound) => {
-              Notification.create({
-                notificator: foundUser,
-                notificated: postFound.user,
-                type: "Like",
-                message: `${foundUser.firstName} ${foundUser.lastName} liked your post`,
-                post: post,
-                read: false,
-              }).then((notification) => {
-                res
-                  .status(StatusCodes.CREATED)
-                  .json(`Created like notification: ${notification}`);
-              });
-            });
-          });
+        const createdLike = await Like.create(like);
+        await createdLike.populate("user post");
+        Notification.create({
+          notificator: createdLike.user,
+          notificated: createdLike.post.user,
+          type: "Like",
+          message: `${createdLike.user.firstName} ${createdLike.user.lastName} liked your post`,
+          post: createdLike.post,
+          read: false,
+        }).then((notification) => {
+          res
+            .status(StatusCodes.CREATED)
+            .json(`Created like notification: ${notification}`);
         });
       }
     })
