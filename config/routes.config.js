@@ -3,16 +3,20 @@ const upload = require("../config/cloudinary.config");
 
 const authController = require("../controllers/auth.controller");
 const usersController = require("../controllers/user.controller");
-const postController = require("../controllers/post.controller");
+const postsController = require("../controllers/post.controller");
 const followController = require("../controllers/follow.controller");
+const messagesController = require("../controllers/messages.controller");
 
 const authMiddleware = require("../middlewares/auth.middleware");
 
 /* Auth */
-router.post("/login", authController.login);
 router.post("/signup", upload.single("image"), authController.signup);
+router.post("/login", authController.login);
+// router.post("/logout", authMiddleware.isAuthenticated, authController.logout);
 
 /* User */
+
+//GET USERS (CURRENT AND BY ID PARAMS)
 router.get("/users", authMiddleware.isAuthenticated, usersController.getUsers);
 router.get(
   "/users/me",
@@ -25,44 +29,76 @@ router.get(
   usersController.getUser
 );
 
+//GET CURRENT USER POSTS
+router.get(
+  "/users/me/posts",
+  authMiddleware.isAuthenticated,
+  usersController.getCurrentUserLikes
+);
+
+//GET USER POSTS
+router.get(
+  "/users/:id/posts",
+  authMiddleware.isAuthenticated,
+  usersController.getUserLikes
+);
+
+//GET CURRENT USER LIKES
+router.get(
+  "/users/me/likes",
+  authMiddleware.isAuthenticated,
+  usersController.getCurrentUserLikes
+);
+
+//GET USER LIKES
+router.get(
+  "/users/:id/likes",
+  authMiddleware.isAuthenticated,
+  usersController.getUserLikes
+);
+
 /* Posts */
 
 //CREATE POST
-router.post("/post", authMiddleware.isAuthenticated, postController.newPost);
+router.post(
+  "/posts/create",
+  authMiddleware.isAuthenticated,
+  postsController.newPost
+);
 
 //GET POST WITH COMMENTS
 router.get(
-  "/post/:id",
+  "/posts/:id",
   authMiddleware.isAuthenticated,
-  postController.postWithComments
+  postsController.postWithComments
 );
 
 //DELETE POST
 router.post(
-  "/post/:id/delete",
+  "/posts/:id/delete",
   authMiddleware.isAuthenticated,
-  postController.deletePost
+  postsController.deletePost
 );
 
 //LIKE POST
 router.post(
-  "/post/:id/like",
+  "/posts/:id/like",
   authMiddleware.isAuthenticated,
-  postController.likePost
+  postsController.likePost
 );
 
 //COMMENT POST
 router.post(
-  "/post/:id/comment",
+  "/posts/:id/comment",
   authMiddleware.isAuthenticated,
-  postController.commentPost
+  postsController.commentPost
 );
 
 //DELETE COMMENT
 router.post(
-  "/post/comment/:id/delete",
+  "/posts/comment/:id/delete",
   authMiddleware.isAuthenticated,
-  postController.deleteComment
+  postsController.deleteComment
 );
 
 /* Follows */
@@ -70,6 +106,15 @@ router.post(
   "/users/:id/follow",
   authMiddleware.isAuthenticated,
   followController.follow
+);
+
+/* Messages */
+
+//CREATE MESSAGE
+router.post(
+  "/messages/:id/create",
+  authMiddleware.isAuthenticated,
+  messagesController.newMessage
 );
 
 module.exports = router;

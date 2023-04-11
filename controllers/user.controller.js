@@ -3,6 +3,8 @@ const createError = require("http-errors");
 const { StatusCodes } = require("http-status-codes");
 
 const User = require("../models/User.model");
+const Like = require("../models/Like.model");
+const Post = require("../models/Post.model");
 
 const NOT_FOUND_ERROR = createError(StatusCodes.NOT_FOUND, USER_NOT_FOUND);
 
@@ -34,5 +36,51 @@ module.exports.getUser = (req, res, next) => {
 module.exports.getUsers = (req, res, next) => {
   User.find({ _id: { $ne: req.currentUserId } })
     .then((users) => res.json(users))
+    .catch(next);
+};
+
+module.exports.getCurrentUserPosts = (req, res, next) => {
+  Post.find({ user: req.currentUserId }).then((posts) => {
+    if (posts) {
+      res.json(posts);
+    } else if (!posts) {
+      res.status(StatusCodes.NO_CONTENT).json("There are no posts yet");
+    }
+  });
+};
+
+module.exports.getCurrentUserPosts = (req, res, next) => {
+  Post.find({ user: req.params.id }).then((posts) => {
+    if (posts) {
+      res.json(posts);
+    } else if (!posts) {
+      res.status(StatusCodes.NO_CONTENT).json("There are no posts yet");
+    }
+  });
+};
+
+module.exports.getCurrentUserLikes = (req, res, next) => {
+  Like.find({ user: req.currentUserId })
+    .populate("post")
+    .then((postsLiked) => {
+      if (postsLiked) {
+        res.json(postsLiked);
+      } else if (!postsLiked) {
+        res.status(StatusCodes.NO_CONTENT).json("There are no likes yet");
+      }
+    })
+    .catch(next);
+};
+
+module.exports.getUserLikes = (req, res, next) => {
+  Like.find({ user: req.params.id })
+    .populate("post")
+    .then((postsLiked) => {
+      if (postsLiked) {
+        res.json(postsLiked);
+      } else if (!postsLiked) {
+        res.status(StatusCodes.NO_CONTENT).json("There are no likes yet");
+      }
+    })
     .catch(next);
 };
