@@ -40,28 +40,35 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.getCurrentUserPosts = (req, res, next) => {
-  Post.find({ user: req.currentUserId }).then((posts) => {
-    if (posts) {
-      res.json(posts);
-    } else if (!posts) {
-      res.status(StatusCodes.NO_CONTENT).json("There are no posts yet");
-    }
-  });
+  Post.find({ user: req.currentUserId })
+    .then((posts) => {
+      if (posts) {
+        res.json(posts);
+      } else if (!posts) {
+        res.status(StatusCodes.NO_CONTENT).json("There are no posts yet");
+      }
+    })
+    .catch(next);
 };
 
-module.exports.getCurrentUserPosts = (req, res, next) => {
-  Post.find({ user: req.params.id }).then((posts) => {
-    if (posts) {
-      res.json(posts);
-    } else if (!posts) {
-      res.status(StatusCodes.NO_CONTENT).json("There are no posts yet");
-    }
-  });
+module.exports.getUserPosts = (req, res, next) => {
+  Post.find({ user: req.params.id })
+    .then((posts) => {
+      if (posts) {
+        res.json(posts);
+      } else if (!posts) {
+        res.status(StatusCodes.NO_CONTENT).json("There are no posts yet");
+      }
+    })
+    .catch(next);
 };
 
 module.exports.getCurrentUserLikes = (req, res, next) => {
   Like.find({ user: req.currentUserId })
-    .populate("post")
+    .populate({
+      path: "post user sunSign moonSign ascendantSign",
+      strictPopulate: false,
+    })
     .then((postsLiked) => {
       if (postsLiked) {
         res.json(postsLiked);

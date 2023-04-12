@@ -12,7 +12,6 @@ const authMiddleware = require("../middlewares/auth.middleware");
 /* Auth */
 router.post("/signup", upload.single("image"), authController.signup);
 router.post("/login", authController.login);
-// router.post("/logout", authMiddleware.isAuthenticated, authController.logout);
 
 /* User */
 
@@ -33,14 +32,14 @@ router.get(
 router.get(
   "/users/me/posts",
   authMiddleware.isAuthenticated,
-  usersController.getCurrentUserLikes
+  usersController.getCurrentUserPosts
 );
 
 //GET USER POSTS
 router.get(
   "/users/:id/posts",
   authMiddleware.isAuthenticated,
-  usersController.getUserLikes
+  usersController.getUserPosts
 );
 
 //GET CURRENT USER LIKES
