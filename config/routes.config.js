@@ -101,10 +101,40 @@ router.post(
 );
 
 /* Follows */
+
+//CREATE FOLLOW
 router.post(
   "/users/:id/follow",
   authMiddleware.isAuthenticated,
   followController.follow
+);
+
+//GET CURRENT USER FOLLOWERS
+router.get(
+  "/users/me/followers",
+  authMiddleware.isAuthenticated,
+  followController.getCurrentUserFollowers
+);
+
+//GET CURRENT USER FOLLOWEDS
+router.get(
+  "/users/me/followeds",
+  authMiddleware.isAuthenticated,
+  followController.getCurrentUserFolloweds
+);
+
+//GET USER FOLLOWERS
+router.get(
+  "/users/:id/followers",
+  authMiddleware.isAuthenticated,
+  followController.getUserFollowers
+);
+
+//GET USER FOLLOWEDS
+router.get(
+  "/users/:id/followeds",
+  authMiddleware.isAuthenticated,
+  followController.getUserFolloweds
 );
 
 /* Messages */
