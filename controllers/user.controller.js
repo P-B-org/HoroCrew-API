@@ -23,6 +23,7 @@ module.exports.getCurrentUser = (req, res, next) => {
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.params.id)
+    .populate("sunSign moonSign ascendantSign")
     .then((user) => {
       if (!user) {
         next(NOT_FOUND_ERROR);
@@ -53,6 +54,7 @@ module.exports.getCurrentUserPosts = (req, res, next) => {
 
 module.exports.getUserPosts = (req, res, next) => {
   Post.find({ user: req.params.id })
+    .populate("user")
     .then((posts) => {
       if (posts) {
         res.json(posts);
@@ -81,7 +83,7 @@ module.exports.getCurrentUserLikes = (req, res, next) => {
 
 module.exports.getUserLikes = (req, res, next) => {
   Like.find({ user: req.params.id })
-    .populate("post")
+    .populate("user")
     .then((postsLiked) => {
       if (postsLiked) {
         res.json(postsLiked);

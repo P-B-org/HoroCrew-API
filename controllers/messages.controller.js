@@ -3,16 +3,9 @@ const Notification = require("../models/Notification.model");
 const { StatusCodes } = require("http-status-codes");
 
 module.exports.newMessage = (req, res, next) => {
-  const sender = req.currentUserId;
-  const receiver = req.params.id;
+  const { sender, receiver, msg } = req.body;
 
-  const message = {
-    ...req.body,
-    sender: sender,
-    receiver: receiver,
-  };
-
-  Message.create(message)
+  Message.create({ sender, receiver, msg })
     .then((createdMessage) => {
       console.log(createdMessage);
       return Notification.create({
@@ -23,7 +16,7 @@ module.exports.newMessage = (req, res, next) => {
       }).then((notification) => {
         res
           .status(StatusCodes.CREATED)
-          .json(`Created like notification: ${notification}`);
+          .json(`Created message notification: ${notification}`);
       });
     })
     .catch(next);
@@ -35,5 +28,13 @@ module.exports.getMessages = (req, res, next) => {
     $and: [{ sender: req.params.id }, { receiver: req.currentUserId }],
   })
     .populate("sender")
-    .populate("receiver");
+    .populate("receiver")
+    .then((msgs) => {
+      msgs.forEach((msg) => {
+        msg.hour = moment(msg.createdAt).format("DD/MM/YY - hh:mm");
+      });
+      msgs.sort((a, b) => b.createdAt - a.createdAt);
+      res.status(201).json(msgs);
+    })
+    .catch((err) => next(err));
 };

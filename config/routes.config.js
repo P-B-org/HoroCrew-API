@@ -5,6 +5,7 @@ const authController = require("../controllers/auth.controller");
 const usersController = require("../controllers/user.controller");
 const postsController = require("../controllers/post.controller");
 const followController = require("../controllers/follow.controller");
+const notificationController = require("../controllers/notifications.controller");
 const messagesController = require("../controllers/messages.controller");
 
 const authMiddleware = require("../middlewares/auth.middleware");
@@ -144,6 +145,14 @@ router.post(
   "/messages/:id/create",
   authMiddleware.isAuthenticated,
   messagesController.newMessage
+);
+
+/* Notifications */
+
+router.get(
+  "/users/me/notifications",
+  authMiddleware.isAuthenticated,
+  notificationController.getNotifications
 );
 
 module.exports = router;
