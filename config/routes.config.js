@@ -59,6 +59,9 @@ router.get(
 
 /* Posts */
 
+//GET ALL POSTS
+router.get("/posts", authMiddleware.isAuthenticated, postsController.getPosts);
+
 //CREATE POST
 router.post(
   "/posts/create",

@@ -147,3 +147,19 @@ module.exports.postWithComments = (req, res, next) => {
     })
     .catch(next);
 };
+
+//GET ALL POSTS
+module.exports.getPosts = (req, res, next) => {
+  Post.find()
+    .populate({
+      path: "user",
+      populate: [
+        {
+          path: "sunSign moonSign ascendantSign",
+        },
+      ],
+    })
+    .then((posts) => {
+      res.json(posts);
+    });
+};

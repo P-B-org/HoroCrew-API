@@ -42,6 +42,7 @@ module.exports.getUsers = (req, res, next) => {
 
 module.exports.getCurrentUserPosts = (req, res, next) => {
   Post.find({ user: req.currentUserId })
+    .sort({ createdAt: -1 })
     .then((posts) => {
       if (posts) {
         res.json(posts);

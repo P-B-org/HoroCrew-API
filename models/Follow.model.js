@@ -18,7 +18,6 @@ const followSchema = new mongoose.Schema(
     toJSON: {
       transform: (doc, ret) => {
         delete ret.__v;
-        delete ret._id;
       },
     },
   }
