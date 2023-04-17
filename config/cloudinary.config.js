@@ -10,7 +10,7 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  folder: "signs-pic",
+  folder: "HoroCrew",
   allowedFormats: ["jpg", "png"],
   filename: function (req, file, cb) {
     cb(null, file.originalname);

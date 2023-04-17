@@ -66,6 +66,7 @@ router.get("/posts", authMiddleware.isAuthenticated, postsController.getPosts);
 router.post(
   "/posts/create",
   authMiddleware.isAuthenticated,
+  upload.any(),
   postsController.newPost
 );
 
@@ -148,6 +149,13 @@ router.post(
   "/messages/:id/create",
   authMiddleware.isAuthenticated,
   messagesController.newMessage
+);
+
+//GET MESSAGES
+router.get(
+  "/messages/:id/",
+  authMiddleware.isAuthenticated,
+  messagesController.getMessages
 );
 
 /* Notifications */

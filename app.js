@@ -22,56 +22,56 @@ app.use(logger("dev"));
 app.use(express.json());
 
 /* SOCKET */
-const server = require("http").createServer(app);
-const options = { cors: { origin: "*" } };
-const io = require("socket.io")(server, options);
+// const server = require("http").createServer(app);
+// const options = { cors: { origin: "*" } };
+// const io = require("socket.io")(server, options);
 
-const onlineUsers = [];
+// const onlineUsers = [];
 
-const addNewUser = (email, name, socketID) => {
-  !onlineUsers.some((user) => user.email === email) &&
-    onlineUsers.push({ email, name, socketID });
-};
+// const addNewUser = (email, name, socketID) => {
+//   !onlineUsers.some((user) => user.email === email) &&
+//     onlineUsers.push({ email, name, socketID });
+// };
 
-const removeUser = (socketID) => {
-  return onlineUsers.forEach((user, index) => {
-    if (user.socketID === socketID) {
-      return onlineUsers.splice(index, 1);
-    }
-  });
-};
+// const removeUser = (socketID) => {
+//   return onlineUsers.forEach((user, index) => {
+//     if (user.socketID === socketID) {
+//       return onlineUsers.splice(index, 1);
+//     }
+//   });
+// };
 
-io.on("connection", (socket) => {
-  socket.on("newUser", (user) => {
-    addNewUser(user.email, user.name, socket.id);
-  });
+// io.on("connection", (socket) => {
+//   socket.on("newUser", (user) => {
+//     addNewUser(user.email, user.name, socket.id);
+//   });
 
-  socket.on("disconnect", () => {
-    removeUser(socket.id);
-  });
+//   socket.on("disconnect", () => {
+//     removeUser(socket.id);
+//   });
 
-  // NOTIFICATION
-  socket.on("notification", (email) => {
-    const userToNot = onlineUsers.find((user) => {
-      return user.email === email;
-    });
+//   // NOTIFICATION
+//   socket.on("notification", (email) => {
+//     const userToNot = onlineUsers.find((user) => {
+//       return user.email === email;
+//     });
 
-    if (userToNot) {
-      io.to(userToNot.socketID).emit("not");
-    }
-  });
+//     if (userToNot) {
+//       io.to(userToNot.socketID).emit("not");
+//     }
+//   });
 
-  // MESSAGES
-  socket.on("message", (email) => {
-    const userToNot = onlineUsers.find((user) => {
-      return user.email === email;
-    });
+//   // MESSAGES
+//   socket.on("message", (email) => {
+//     const userToNot = onlineUsers.find((user) => {
+//       return user.email === email;
+//     });
 
-    if (userToNot) {
-      io.to(userToNot.socketID).emit("msg");
-    }
-  });
-});
+//     if (userToNot) {
+//       io.to(userToNot.socketID).emit("msg");
+//     }
+//   });
+// });
 
 /* Routes */
 

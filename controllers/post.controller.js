@@ -19,8 +19,10 @@ module.exports.newPost = (req, res, next) => {
     user: req.currentUserId,
   };
 
-  if (req.file) {
-    newPost.image = req.file.path;
+  if (req.files) {
+    newPost.images = req.files.map((file) => {
+      return file.path;
+    });
   }
 
   Post.create(newPost)
@@ -151,6 +153,7 @@ module.exports.postWithComments = (req, res, next) => {
 //GET ALL POSTS
 module.exports.getPosts = (req, res, next) => {
   Post.find()
+    .sort({ createdAt: -1 })
     .populate({
       path: "user",
       populate: [

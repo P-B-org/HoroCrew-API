@@ -69,8 +69,15 @@ module.exports.getUserPosts = (req, res, next) => {
 module.exports.getCurrentUserLikes = (req, res, next) => {
   Like.find({ user: req.currentUserId })
     .populate({
-      path: "post user sunSign moonSign ascendantSign",
-      strictPopulate: false,
+      path: "post",
+      populate: [
+        {
+          path: "user",
+          populate: {
+            path: "sunSign moonSign ascendantSign",
+          },
+        },
+      ],
     })
     .then((postsLiked) => {
       if (postsLiked) {
@@ -84,7 +91,17 @@ module.exports.getCurrentUserLikes = (req, res, next) => {
 
 module.exports.getUserLikes = (req, res, next) => {
   Like.find({ user: req.params.id })
-    .populate("user")
+    .populate({
+      path: "post",
+      populate: [
+        {
+          path: "user",
+          populate: {
+            path: "sunSign moonSign ascendantSign",
+          },
+        },
+      ],
+    })
     .then((postsLiked) => {
       if (postsLiked) {
         res.json(postsLiked);
