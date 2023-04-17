@@ -153,7 +153,7 @@ router.post(
 
 //GET MESSAGES
 router.get(
-  "/messages/:id/",
+  "/messages/:id",
   authMiddleware.isAuthenticated,
   messagesController.getMessages
 );

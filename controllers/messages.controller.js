@@ -1,6 +1,7 @@
 const Message = require("../models/Message.model");
 const Notification = require("../models/Notification.model");
 const { StatusCodes } = require("http-status-codes");
+const moment = require("moment");
 
 module.exports.newMessage = (req, res, next) => {
   const newMessage = {
@@ -30,8 +31,10 @@ module.exports.newMessage = (req, res, next) => {
 
 module.exports.getMessages = (req, res, next) => {
   Message.find({
-    $and: [{ sender: req.currentUserId }, { receiver: req.params.id }],
-    $and: [{ sender: req.params.id }, { receiver: req.currentUserId }],
+    $or: [
+      { $and: [{ sender: req.currentUserId }, { receiver: req.params.id }] },
+      { $and: [{ sender: req.params.id }, { receiver: req.currentUserId }] },
+    ],
   })
     .populate("sender receiver")
     .then((msgs) => {
