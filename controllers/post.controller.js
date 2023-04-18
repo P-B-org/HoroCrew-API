@@ -40,7 +40,11 @@ module.exports.deletePost = (req, res, next) => {
     .then((post) => {
       if (post) {
         return Post.findByIdAndDelete(post).then((post) => {
-          res.status(StatusCodes.NO_CONTENT).json(`Post deleted: ${post}`);
+          return Like.find({ post: post }).then((likeId) => {
+            Like.findByIdAndDelete(likeId).then((deleteId) => {
+              res.status(StatusCodes.NO_CONTENT).json("Post and Like deleted");
+            });
+          });
         });
       } else if (!post) {
         next(authError);

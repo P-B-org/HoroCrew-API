@@ -37,11 +37,8 @@ module.exports.getMessages = (req, res, next) => {
     ],
   })
     .populate("sender receiver")
+    .sort({ createdAt: 1 })
     .then((msgs) => {
-      msgs.forEach((msg) => {
-        msg.hour = moment(msg.createdAt).format("DD/MM/YY - hh:mm");
-      });
-      msgs.sort((a, b) => b.createdAt - a.createdAt);
       res.status(201).json(msgs);
     })
     .catch((err) => next(err));
