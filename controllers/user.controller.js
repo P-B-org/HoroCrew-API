@@ -53,19 +53,7 @@ module.exports.getUsers = (req, res, next) => {
 
     .then((users) => res.json(users))
     .catch(next);
-  // User.find({ _id: { $ne: req.currentUserId } })
-  // search
-  //   ? {
-  //     $or: [{ firstName: criteria }, { lastName: criteria }],
-  //     email: { $ne: req.user.email },
-  //   }
-  //   : { email: { $ne: req.user.email } }
 
-  //     .sort({ firstName: 1, lastName: 1 })
-  //     .populate("sunSign moonSign ascendantSign")
-
-  //     .then((users) => res.json(users))
-  //     .catch(next);
 };
 
 module.exports.getCurrentUserPosts = (req, res, next) => {
