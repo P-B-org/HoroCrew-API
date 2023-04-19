@@ -35,9 +35,25 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.getUsers = (req, res, next) => {
-  User.find({ _id: { $ne: req.currentUserId } })
+  const { search } = req.query
+
+  if (search) {
+    criteria = new RegExp(search, "i");
+  }
+  User.find(
+    search
+      ? {
+        $or: [{ firstName: criteria }, { lastName: criteria }],
+        email: { $ne: req.user.email },
+      }
+      : { email: { $ne: req.user.email } }
+  )
+    .sort({ firstName: 1, lastName: 1 })
+    .populate("sunSign moonSign ascendantSign")
+
     .then((users) => res.json(users))
     .catch(next);
+
 };
 
 module.exports.getCurrentUserPosts = (req, res, next) => {
@@ -111,3 +127,4 @@ module.exports.getUserLikes = (req, res, next) => {
     })
     .catch(next);
 };
+
