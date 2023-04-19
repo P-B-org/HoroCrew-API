@@ -9,6 +9,7 @@ const notificationController = require("../controllers/notifications.controller"
 const messagesController = require("../controllers/messages.controller");
 
 const authMiddleware = require("../middlewares/auth.middleware");
+const userMiddleware = require("../middlewares/user.middleware");
 
 /* Auth */
 router.post("/signup", upload.single("image"), authController.signup);
@@ -17,7 +18,7 @@ router.post("/login", authController.login);
 /* User */
 
 //GET USERS (CURRENT AND BY ID PARAMS)
-router.get("/users", authMiddleware.isAuthenticated, usersController.getUsers);
+router.get("/users", authMiddleware.isAuthenticated, userMiddleware.addCurrentUserToReq, usersController.getUsers);
 router.get(
   "/users/me",
   authMiddleware.isAuthenticated,
