@@ -55,6 +55,7 @@ module.exports.getCurrentUserPosts = (req, res, next) => {
 
 module.exports.getUserPosts = (req, res, next) => {
   Post.find({ user: req.params.id })
+    .sort({ createdAt: -1 })
     .populate("user")
     .then((posts) => {
       if (posts) {
@@ -68,6 +69,7 @@ module.exports.getUserPosts = (req, res, next) => {
 
 module.exports.getCurrentUserLikes = (req, res, next) => {
   Like.find({ user: req.currentUserId })
+    .sort({ createdAt: -1 })
     .populate({
       path: "post",
       populate: [
@@ -91,6 +93,7 @@ module.exports.getCurrentUserLikes = (req, res, next) => {
 
 module.exports.getUserLikes = (req, res, next) => {
   Like.find({ user: req.params.id })
+    .sort({ createdAt: -1 })
     .populate({
       path: "post",
       populate: [

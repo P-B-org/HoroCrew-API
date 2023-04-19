@@ -1,7 +1,6 @@
 const Message = require("../models/Message.model");
 const Notification = require("../models/Notification.model");
 const { StatusCodes } = require("http-status-codes");
-const moment = require("moment");
 
 module.exports.newMessage = (req, res, next) => {
   const newMessage = {

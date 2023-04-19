@@ -62,6 +62,20 @@ router.get(
 //GET ALL POSTS
 router.get("/posts", authMiddleware.isAuthenticated, postsController.getPosts);
 
+//GET POST LIKES
+router.get(
+  "/posts/:id/likes",
+  authMiddleware.isAuthenticated,
+  postsController.getPostLikes
+);
+
+//GET POST COMMENTS
+router.get(
+  "/posts/:id/comments",
+  authMiddleware.isAuthenticated,
+  postsController.getPostComments
+);
+
 //CREATE POST
 router.post(
   "/posts/create",
