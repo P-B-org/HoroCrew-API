@@ -1,4 +1,3 @@
-const User = require("../models/User.model");
 const Post = require("../models/Post.model");
 const Like = require("../models/Like.model");
 const Comment = require("../models/Comment.model");
@@ -142,14 +141,24 @@ module.exports.deleteComment = (req, res, next) => {
 //GET POST WITH COMMENTS
 module.exports.postWithComments = (req, res, next) => {
   Post.findById(req.params.id)
+    .populate({
+      path: "user",
+      populate: [
+        {
+          path: "sunSign moonSign ascendantSign",
+        },
+      ],
+    })
     .then((post) => {
-      return Comment.find({ post: post._id }).then((comments) => {
-        const postWithComments = {
-          post,
-          comments,
-        };
-        res.json(postWithComments);
-      });
+      return Comment.find({ post: post._id })
+        .populate("user")
+        .then((comments) => {
+          const postWithComments = {
+            post,
+            comments,
+          };
+          res.json(postWithComments);
+        });
     })
     .catch(next);
 };
@@ -168,5 +177,28 @@ module.exports.getPosts = (req, res, next) => {
     })
     .then((posts) => {
       res.json(posts);
-    });
+    })
+    .catch(next);
+};
+
+//GET POST LIKES
+module.exports.getPostLikes = (req, res, next) => {
+  Post.findById(req.params.id)
+    .then((post) => {
+      Like.find({ post: post }).then((postLikes) => {
+        res.json(postLikes);
+      });
+    })
+    .catch(next);
+};
+
+//GET POST COMMENTS
+module.exports.getPostComments = (req, res, next) => {
+  Post.findById(req.params.id)
+    .then((post) => {
+      Comment.find({ post: post }).then((postComments) => {
+        res.json(postComments);
+      });
+    })
+    .catch(next);
 };
