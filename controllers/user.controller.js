@@ -130,4 +130,43 @@ module.exports.getUserLikes = (req, res, next) => {
     })
     .catch(next);
 };
+module.exports.editProfile = async (req, res, next) => {
+  try {
+    const { timeOfBirth, dayOfBirth, monthOfBirth, yearOfBirth } =
+      req.body;
 
+    const signs = await astralCalc(
+      timeOfBirth,
+      dayOfBirth,
+      monthOfBirth,
+      yearOfBirth
+    );
+
+    const userBody = {
+      ...req.body,
+      ...signs.ids,
+    };
+
+    if (req.file) {
+      userBody.image = req.file.path;
+    } else {
+      userBody.image = `/images/signs/${signs.names.sunSign}.png`;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, userBody, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.json(updatedUser);
+  } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Validation error",
+        errors: err.errors,
+      });
+    } else {
+      next(err);
+    }
+  }
+};
