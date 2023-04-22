@@ -14,12 +14,21 @@ const userMiddleware = require("../middlewares/user.middleware");
 /* Auth */
 router.post("/signup", upload.single("image"), authController.signup);
 router.post("/login", authController.login);
-router.post("/users/me/edit", authMiddleware.isAuthenticated, usersController.editProfile)
+router.post(
+  "/users/me/edit",
+  authMiddleware.isAuthenticated,
+  usersController.editProfile
+);
 
 /* User */
 
 //GET USERS (CURRENT AND BY ID PARAMS)
-router.get("/users", authMiddleware.isAuthenticated, userMiddleware.addCurrentUserToReq, usersController.getUsers);
+router.get(
+  "/users",
+  authMiddleware.isAuthenticated,
+  userMiddleware.addCurrentUserToReq,
+  usersController.getUsers
+);
 router.get(
   "/users/me",
   authMiddleware.isAuthenticated,
@@ -180,6 +189,18 @@ router.get(
   "/users/me/notifications",
   authMiddleware.isAuthenticated,
   notificationController.getNotifications
+);
+
+router.get(
+  "/users/me/notifications/read",
+  authMiddleware.isAuthenticated,
+  notificationController.readNotifications
+);
+
+router.get(
+  "/users/me/messages/:id",
+  authMiddleware.isAuthenticated,
+  notificationController.getMessageNotifications
 );
 
 module.exports = router;

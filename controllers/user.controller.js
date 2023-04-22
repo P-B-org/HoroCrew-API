@@ -6,6 +6,7 @@ const { astralCalc } = require("../utils/signsHelper");
 const User = require("../models/User.model");
 const Like = require("../models/Like.model");
 const Post = require("../models/Post.model");
+const Follow = require("../models/Follow.model");
 
 const NOT_FOUND_ERROR = createError(StatusCodes.NOT_FOUND, USER_NOT_FOUND);
 
@@ -51,10 +52,18 @@ module.exports.getUsers = (req, res, next) => {
   )
     .sort({ firstName: 1, lastName: 1 })
     .populate("sunSign moonSign ascendantSign")
-
     .then((users) => res.json(users))
     .catch(next);
 };
+
+// module.exports.getCurrentUserMutuals = (req, res, next) => {
+//   Follow.find({
+//     $or: [
+//       { $and: [{ follower: req.currentUserId }, { followed: req.params.id }] },
+//       { $and: [{ follower: req.params.id }, { followed: req.currentUserId }] },
+//     ],
+//   });
+// };
 
 module.exports.getCurrentUserPosts = (req, res, next) => {
   Post.find({ user: req.currentUserId })
