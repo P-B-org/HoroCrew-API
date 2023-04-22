@@ -14,7 +14,7 @@ const userMiddleware = require("../middlewares/user.middleware");
 /* Auth */
 router.post("/signup", upload.single("image"), authController.signup);
 router.post("/login", authController.login);
-router.post("/users/me/edit", authMiddleware.isAuthenticated, usersController.editProfile)
+router.patch("/users/me/edit", authMiddleware.isAuthenticated, usersController.editProfile)
 
 /* User */
 

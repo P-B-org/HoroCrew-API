@@ -69,6 +69,9 @@ const userSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    facialId: {
+      type: String,
+    }
   },
   {
     timestamps: true,

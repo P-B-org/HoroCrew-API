@@ -127,7 +127,9 @@ const astralCalc = async (
   monthOfBirth,
   yearOfBirth
 ) => {
+  console.log({ timeOfBirth, dayOfBirth, monthOfBirth, yearOfBirth })
   const hour = Number(timeOfBirth.slice(0, 2));
+
 
   const sunSign = calculateSunSign(Number(dayOfBirth), Number(monthOfBirth));
   const moonSign = calculateMoonSign(

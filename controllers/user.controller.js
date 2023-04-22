@@ -35,6 +35,19 @@ module.exports.getUser = (req, res, next) => {
     .catch(next);
 };
 
+{/*module.exports.getCurrentUserFacialId = (req, res, next) => {
+  User.findById(req.currentUserId)
+    .then((facial) => {
+      if (!facial) {
+        next(NOT_FOUND_ERROR);
+      } else {
+        res.json(facial);
+      }
+    })
+    .catch(next);
+};*/}
+
+
 module.exports.getUsers = (req, res, next) => {
   const { search } = req.query;
 
@@ -44,9 +57,9 @@ module.exports.getUsers = (req, res, next) => {
   User.find(
     search
       ? {
-          $or: [{ firstName: criteria }, { lastName: criteria }],
-          email: { $ne: req.user.email },
-        }
+        $or: [{ firstName: criteria }, { lastName: criteria }],
+        email: { $ne: req.user.email },
+      }
       : { email: { $ne: req.user.email } }
   )
     .sort({ firstName: 1, lastName: 1 })
@@ -135,19 +148,19 @@ module.exports.editProfile = async (req, res, next) => {
     const {
       firstName,
       lastName,
+      dayOfBirth,
+      monthOfBirth,
+      yearOfBirth,
+      timeOfBirth,
+    } = req.body;
+
+    const signs = await astralCalc(
+      // firstName,
+      // lastName,
       timeOfBirth,
       dayOfBirth,
       monthOfBirth,
       yearOfBirth,
-    } = req.body;
-
-    const signs = await astralCalc(
-      firstName,
-      lastName,
-      timeOfBirth,
-      dayOfBirth,
-      monthOfBirth,
-      yearOfBirth
     );
 
     const userBody = {
