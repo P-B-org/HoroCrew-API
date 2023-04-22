@@ -1,6 +1,7 @@
 const { USER_NOT_FOUND } = require("../config/errorMsg.config");
 const createError = require("http-errors");
 const { StatusCodes } = require("http-status-codes");
+const { astralCalc } = require("../utils/signsHelper");
 
 const User = require("../models/User.model");
 const Like = require("../models/Like.model");
@@ -35,7 +36,7 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.getUsers = (req, res, next) => {
-  const { search } = req.query
+  const { search } = req.query;
 
   if (search) {
     criteria = new RegExp(search, "i");
@@ -43,9 +44,9 @@ module.exports.getUsers = (req, res, next) => {
   User.find(
     search
       ? {
-        $or: [{ firstName: criteria }, { lastName: criteria }],
-        email: { $ne: req.user.email },
-      }
+          $or: [{ firstName: criteria }, { lastName: criteria }],
+          email: { $ne: req.user.email },
+        }
       : { email: { $ne: req.user.email } }
   )
     .sort({ firstName: 1, lastName: 1 })
@@ -53,7 +54,6 @@ module.exports.getUsers = (req, res, next) => {
 
     .then((users) => res.json(users))
     .catch(next);
-
 };
 
 module.exports.getCurrentUserPosts = (req, res, next) => {
@@ -132,10 +132,18 @@ module.exports.getUserLikes = (req, res, next) => {
 };
 module.exports.editProfile = async (req, res, next) => {
   try {
-    const { timeOfBirth, dayOfBirth, monthOfBirth, yearOfBirth } =
-      req.body;
+    const {
+      firstName,
+      lastName,
+      timeOfBirth,
+      dayOfBirth,
+      monthOfBirth,
+      yearOfBirth,
+    } = req.body;
 
     const signs = await astralCalc(
+      firstName,
+      lastName,
       timeOfBirth,
       dayOfBirth,
       monthOfBirth,
@@ -153,20 +161,17 @@ module.exports.editProfile = async (req, res, next) => {
       userBody.image = `/images/signs/${signs.names.sunSign}.png`;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(req.user.id, userBody, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedUser = await User.findByIdAndUpdate(
+      req.currentUserId,
+      userBody,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     res.json(updatedUser);
   } catch (err) {
-    if (err instanceof mongoose.Error.ValidationError) {
-      res.status(StatusCodes.BAD_REQUEST).json({
-        message: "Validation error",
-        errors: err.errors,
-      });
-    } else {
-      next(err);
-    }
+    next(err);
   }
 };

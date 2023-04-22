@@ -40,8 +40,10 @@ module.exports.deletePost = (req, res, next) => {
       if (post) {
         return Post.findByIdAndDelete(post).then((post) => {
           return Like.find({ post: post }).then((likeId) => {
-            Like.findByIdAndDelete(likeId).then((deleteId) => {
-              res.status(StatusCodes.NO_CONTENT).json("Post and Like deleted");
+            return Like.findByIdAndDelete(likeId).then((deleteLike) => {
+              res
+                .status(StatusCodes.NO_CONTENT)
+                .json("Post, comments and Likes deleted");
             });
           });
         });
