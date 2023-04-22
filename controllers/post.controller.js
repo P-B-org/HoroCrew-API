@@ -39,11 +39,11 @@ module.exports.deletePost = (req, res, next) => {
     .then((post) => {
       if (post) {
         return Post.findByIdAndDelete(post).then((post) => {
-          return Like.find({ post: post }).then((likeId) => {
-            return Like.findByIdAndDelete(likeId).then((deleteLike) => {
-              res
-                .status(StatusCodes.NO_CONTENT)
-                .json("Post, comments and Likes deleted");
+          return Like.find({ post: post }).then((likes) => {
+            likes.forEach((like) => like.deleteOne());
+            return Comment.find({ post: post }).then((comments) => {
+              comments.forEach((comment) => comment.deleteOne());
+              res.json("post deleted");
             });
           });
         });
@@ -107,16 +107,27 @@ module.exports.likePost = (req, res, next) => {
 };
 
 //COMMENT POST
-module.exports.commentPost = (req, res, next) => {
+module.exports.commentPost = async (req, res, next) => {
   const comment = {
     ...req.body,
     user: req.currentUserId,
     post: req.params.id,
   };
 
-  Comment.create(comment)
-    .then((comment) => {
-      res.status(StatusCodes.CREATED).json(`New comment created: ${comment}`);
+  const createdComment = await Comment.create(comment);
+  await createdComment.populate("user post");
+  Notification.create({
+    notificator: createdComment.user,
+    notificated: createdComment.post.user,
+    type: "Comment",
+    message: `${createdComment.user.firstName} ${createdComment.user.lastName} commented one of your posts`,
+    post: createdComment.post,
+    read: false,
+  })
+    .then((notification) => {
+      res
+        .status(StatusCodes.CREATED)
+        .json(`Created comment notification: ${notification}`);
     })
     .catch(next);
 };
@@ -128,11 +139,26 @@ module.exports.deleteComment = (req, res, next) => {
   })
     .then((comment) => {
       if (comment) {
-        return Comment.findByIdAndDelete(comment).then((deleteComment) => {
-          res
-            .status(StatusCodes.NO_CONTENT)
-            .json(`Comment deleted: ${deleteComment}`);
-        });
+        return Comment.findByIdAndDelete(comment)
+          .populate("post")
+          .then((deleteComment) => {
+            console.log(deleteComment);
+            return Notification.findOne({
+              $and: [
+                { notificator: deleteComment.user },
+                { notificated: deleteComment.post.user },
+                { type: "Comment" },
+              ],
+            }).then((dbNotification) => {
+              Notification.findByIdAndDelete(dbNotification).then(
+                (deleteNotification) => {
+                  res
+                    .status(StatusCodes.NO_CONTENT)
+                    .json(`Delete notification: ${deleteNotification}`);
+                }
+              );
+            });
+          });
       } else if (!comment) {
         next(authError);
       }
