@@ -129,7 +129,7 @@ module.exports.getUserLikes = (req, res, next) => {
 };
 module.exports.editProfile = async (req, res, next) => {
   try {
-    const { email, timeOfBirth, dayOfBirth, monthOfBirth, yearOfBirth } =
+    const { timeOfBirth, dayOfBirth, monthOfBirth, yearOfBirth } =
       req.body;
 
     const signs = await astralCalc(
