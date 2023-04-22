@@ -35,26 +35,27 @@ module.exports.readNotifications = (req, res, next) => {
     .then((notifications) => {
       const unReadedNotifications = notifications.filter((n) => !n.read);
 
-      Notification.updateMany({ user: req.currentUserId }, { read: true }).then(
-        (updatedNts) => {
-          const setNotifications = notifications.filter(
-            (value, index, self) =>
-              index === self.findIndex((t) => t.message === value.message)
-          );
+      Notification.updateMany(
+        { notificated: req.currentUserId },
+        { read: true }
+      ).then((updatedNts) => {
+        const setNotifications = notifications.filter(
+          (value, index, self) =>
+            index === self.findIndex((t) => t.message === value.message)
+        );
 
-          const notificationsByRead = setNotifications.map((n) => {
-            const isUnread = unReadedNotifications.find(
-              (unReadNt) => unReadNt.id === n.id
-            );
-            if (!isUnread) {
-              return { ...n._doc, read: false };
-            } else {
-              return { ...n._doc, read: true };
-            }
-          });
-          res.json(notificationsByRead);
-        }
-      );
+        const notificationsByRead = setNotifications.map((n) => {
+          const isUnread = unReadedNotifications.find(
+            (unReadNt) => unReadNt.id === n.id
+          );
+          if (!isUnread) {
+            return { ...n._doc, read: false };
+          } else {
+            return { ...n._doc, read: true };
+          }
+        });
+        res.json(notificationsByRead);
+      });
     })
     .catch(next);
 };
