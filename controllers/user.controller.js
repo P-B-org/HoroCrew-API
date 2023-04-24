@@ -7,6 +7,7 @@ const User = require("../models/User.model");
 const Like = require("../models/Like.model");
 const Post = require("../models/Post.model");
 const Follow = require("../models/Follow.model");
+const Notification = require("../models/Notification.model");
 
 const NOT_FOUND_ERROR = createError(StatusCodes.NOT_FOUND, USER_NOT_FOUND);
 
@@ -36,7 +37,8 @@ module.exports.getUser = (req, res, next) => {
     .catch(next);
 };
 
-{/*module.exports.getCurrentUserFacialId = (req, res, next) => {
+{
+  /*module.exports.getCurrentUserFacialId = (req, res, next) => {
   User.findById(req.currentUserId)
     .then((facial) => {
       if (!facial) {
@@ -46,8 +48,8 @@ module.exports.getUser = (req, res, next) => {
       }
     })
     .catch(next);
-};*/}
-
+};*/
+}
 
 module.exports.getUsers = (req, res, next) => {
   const { search } = req.query;
@@ -58,9 +60,9 @@ module.exports.getUsers = (req, res, next) => {
   User.find(
     search
       ? {
-        $or: [{ firstName: criteria }, { lastName: criteria }],
-        email: { $ne: req.user.email },
-      }
+          $or: [{ firstName: criteria }, { lastName: criteria }],
+          email: { $ne: req.user.email },
+        }
       : { email: { $ne: req.user.email } }
   )
     .sort({ firstName: 1, lastName: 1 })
@@ -169,7 +171,7 @@ module.exports.editProfile = async (req, res, next) => {
       timeOfBirth,
       dayOfBirth,
       monthOfBirth,
-      yearOfBirth,
+      yearOfBirth
     );
 
     const userBody = {
@@ -196,4 +198,23 @@ module.exports.editProfile = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+module.exports.deleteAccount = (req, res, next) => {
+  User.findByIdAndDelete(req.currentUserId)
+    .then((deleteUser) => {
+      return Post.find({ user: deleteUser }).then((posts) => {
+        posts.forEach((post) => post.deleteOne());
+        return Like.find({ user: deleteUser }).then((likes) => {
+          likes.forEach((like) => like.deleteOne());
+          Notification.find({ notificator: deleteUser }).then(
+            (notifications) => {
+              notifications.forEach((notification) => notification.deleteOne());
+              res.json(`${deleteUser} deleted`);
+            }
+          );
+        });
+      });
+    })
+    .catch(next);
 };

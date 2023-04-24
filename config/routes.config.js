@@ -15,7 +15,11 @@ const userMiddleware = require("../middlewares/user.middleware");
 router.post("/signup", upload.single("image"), authController.signup);
 router.post("/login", authController.login);
 
-router.patch("/users/me/edit", authMiddleware.isAuthenticated, usersController.editProfile)
+router.patch(
+  "/users/me/edit",
+  authMiddleware.isAuthenticated,
+  usersController.editProfile
+);
 
 /* User */
 
@@ -63,6 +67,13 @@ router.get(
   "/users/:id/likes",
   authMiddleware.isAuthenticated,
   usersController.getUserLikes
+);
+
+//DELETE USER
+router.post(
+  "/users/me/delete",
+  authMiddleware.isAuthenticated,
+  usersController.deleteAccount
 );
 
 /* Posts */
